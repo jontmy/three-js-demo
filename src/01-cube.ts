@@ -27,13 +27,30 @@ const light = new THREE.DirectionalLight(color, intensity);
 light.position.set(-1, 2, 4);
 scene.add(light);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio( window.devicePixelRatio * 1.5 );
-document.body.appendChild(renderer.domElement);
+const canvas = document.querySelector("canvas")!;
+const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+
+function resizeRenderer(renderer: THREE.WebGLRenderer) {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width = (canvas.clientWidth * pixelRatio) | 0;
+    const height = (canvas.clientHeight * pixelRatio) | 0;
+    const needsResize = canvas.width !== width || canvas.height !== height;
+    if (needsResize) {
+        renderer.setSize(width, height, false);
+    }
+    return needsResize;
+}
 
 function render(time: number) {
     time /= 1000;
+
+    const resized = resizeRenderer(renderer);
+    if (resized) {
+        const canvas = renderer.domElement;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+    }
 
     cubes.forEach((cube, i) => {
         const speed = 1 + i * 0.1;
@@ -41,6 +58,7 @@ function render(time: number) {
         cube.rotation.x = rot;
         cube.rotation.y = rot;
     });
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
