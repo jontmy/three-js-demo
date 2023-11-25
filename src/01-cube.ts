@@ -27,8 +27,9 @@ const light = new THREE.DirectionalLight(color, intensity);
 light.position.set(-1, 2, 4);
 scene.add(light);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio( window.devicePixelRatio * 1.5 );
 document.body.appendChild(renderer.domElement);
 
 function render(time: number) {
@@ -38,8 +39,8 @@ function render(time: number) {
         const speed = 1 + i * 0.1;
         const rot = time * speed;
         cube.rotation.x = rot;
-        cube.rotation.y = rot;;
-    })
+        cube.rotation.y = rot;
+    });
     renderer.render(scene, camera);
     requestAnimationFrame(render);
 }
